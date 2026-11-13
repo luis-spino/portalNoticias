@@ -4,9 +4,14 @@ import { getDb } from '../config/db.js';
 const colecao = () => getDb().collection('comentarios');
 
 export const ComentarioModel = {
-  async inserir(comentario) {
-    const resultado = await colecao().insertOne(comentario);
-    return { _id: resultado.insertedId, ...comentario };
+   async inserir(comentario) {
+    const doc = {
+      ...comentario,
+      postId: new ObjectId(comentario.postId),
+      usuarioId: new ObjectId(comentario.usuarioId)
+    };
+    const resultado = await colecao().insertOne(doc);
+    return { _id: resultado.insertedId, ...doc };
   },
 
   listarPorPost(postId, filtro = {}) {

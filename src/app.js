@@ -2,6 +2,8 @@ import express from 'express';
 import { getDb } from './config/db.js';
 import autorRoutes from './routes/autorRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import leitorRoutes from './routes/leitorRoutes.js';
+import comentarioRoutes from './routes/comentarioRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { logger } from './middlewares/logger.js';
 
@@ -21,6 +23,8 @@ app.get('/status', async (req, res) => {
 
 app.use('/api/autores', autorRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/leitores', leitorRoutes);
+app.use('/api', comentarioRoutes);
 
 app.use(errorHandler);
 
