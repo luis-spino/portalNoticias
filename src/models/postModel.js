@@ -4,11 +4,12 @@ import { getDb } from '../config/db.js';
 const colecao = () => getDb().collection('posts');
 
 export const PostModel = {
-  async inserir(post) {
-    const resultado = await colecao().insertOne(post);
-    return { _id: resultado.insertedId, ...post };
+    async inserir(post) {
+    const doc = { ...post, autorId: new ObjectId(post.autorId) };
+    const resultado = await colecao().insertOne(doc);
+    return { _id: resultado.insertedId, ...doc };
   },
-
+  
   listar(filtro = {}) {
     return colecao().find(filtro).sort({ criadoEm: -1 }).toArray();
   },

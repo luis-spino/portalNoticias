@@ -1,6 +1,7 @@
 import express from 'express';
 import { getDb } from './config/db.js';
 import autorRoutes from './routes/autorRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
@@ -17,6 +18,7 @@ app.get('/status', async (req, res) => {
 });
 
 app.use('/api/autores', autorRoutes);
+app.use('/api/posts', postRoutes);
 
 app.use(errorHandler);
 
