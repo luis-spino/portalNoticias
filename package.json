@@ -1,15 +1,16 @@
 {
   "name": "portal-noticias",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend do Portal de Notícias",
+  "main": "server.js",
+  
   "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Larissa Prado e Luis Gustavo",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^18.0.10",
