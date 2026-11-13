@@ -80,8 +80,11 @@ export const PostService = {
     return comAutor(await exigirPost(id));
   },
 
-  async atualizar(id, { titulo, conteudo, tipo, tags } = {}) {
-    await exigirPost(id);
+    async atualizar(id, { titulo, conteudo, tipo, tags } = {}, usuario) {
+    const post = await exigirPost(id);
+    if (String(post.autorId) !== String(usuario._id)) {
+      throw new AppError('Só o autor do post pode editá-lo', 403);
+    }
     const dados = {};
 
     if (titulo) dados.titulo = titulo.trim();
@@ -102,8 +105,12 @@ export const PostService = {
     return comAutor(await PostModel.atualizar(id, dados));
   },
 
-  async remover(id) {
-    await exigirPost(id);
+    async remover(id, usuario) {
+    const post = await exigirPost(id);
+    const ehDono = String(post.autorId) === String(usuario._id);
+    if (!ehDono && usuario.papel !== 'servidor') {
+      throw new AppError('Só o autor ou um servidor pode excluir o post', 403);
+    }
     await PostModel.remover(id);
   }
 };

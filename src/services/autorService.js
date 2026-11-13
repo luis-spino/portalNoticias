@@ -54,7 +54,11 @@ export const AutorService = {
     return formatar(await exigirAutor(id));
   },
 
-  async atualizar(id, { nome, email, sala } = {}) {
+  async atualizar(id, { nome, email, sala } = {}, usuario) {
+    if (usuario.tipo !== 'autor' || String(usuario._id) !== String(id)) {
+      throw new AppError('Você só pode editar o seu próprio cadastro', 403);
+    }
+
     const autor = await exigirAutor(id);
     const dados = {};
 
@@ -85,9 +89,14 @@ export const AutorService = {
     return formatar(await AutorModel.atualizar(id, dados));
   },
 
-  async remover(id) {
+  async remover(id, usuario) {
+    const ehDono = usuario.tipo === 'autor' && String(usuario._id) === String(id);
+    if (!ehDono && usuario.papel !== 'servidor') {
+      throw new AppError('Você só pode excluir o seu próprio cadastro', 403);
+    }
+
     await exigirAutor(id);
-    await PostModel.removerPorAutor(id);
+    await PostModel.removerPorAutor(id); 
     await AutorModel.remover(id);
   }
 };

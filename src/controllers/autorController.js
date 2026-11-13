@@ -14,12 +14,12 @@ export const AutorController = {
     res.json(await AutorService.buscarPorId(req.params.id));
   },
 
-  async atualizar(req, res) {
-    res.json(await AutorService.atualizar(req.params.id, req.body));
+    async atualizar(req, res) {
+    res.json(await AutorService.atualizar(req.params.id, req.body, req.usuario));
   },
 
   async remover(req, res) {
-    await AutorService.remover(req.params.id);
+    await AutorService.remover(req.params.id, req.usuario);
     res.json({ mensagem: 'Autor removido' });
   }
 };

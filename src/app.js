@@ -3,10 +3,12 @@ import { getDb } from './config/db.js';
 import autorRoutes from './routes/autorRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { logger } from './middlewares/logger.js';
 
 const app = express();
 
 app.use(express.json());
+app.use(logger);
 
 app.get('/', (req, res) => {
   res.json({ api: 'Portal de Notícias', status: 'ok' });
