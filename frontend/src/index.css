@@ -513,6 +513,21 @@ a {
   background: var(--papel);
 }
 
+/* ---------- Estados da lista ---------- */
+.estado {
+  padding: 32px 20px;
+  text-align: center;
+  font-weight: 700;
+  background: var(--branco);
+  border: 2px dashed var(--marinho);
+  border-radius: var(--raio);
+}
+
+.estado--erro {
+  background: #ffd3d3;
+  border-style: solid;
+}
+
 /* ---------- Responsivo ---------- */
 @media (max-width: 860px) {
   .layout {

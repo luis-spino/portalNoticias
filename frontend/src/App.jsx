@@ -1,40 +1,38 @@
+import { useEffect, useState } from 'react';
+import { apiGet } from './api.js';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
 import Filtros from './components/Filtros.jsx';
 import PostCard from './components/PostCard.jsx';
 import PostForm from './components/PostForm.jsx';
 
-const POSTS_EXEMPLO = [
-  {
-    _id: '1',
-    titulo: 'Vagas no projeto de robótica',
-    conteudo: 'O laboratório está com 5 vagas abertas para alunos do 2º e 3º anos.',
-    tipo: 'projeto',
-    tags: ['robotica', 'estagio'],
-    autor: { nome: 'Larissa', papel: 'representante' },
-    criadoEm: '2026-11-10T14:00:00.000Z',
-  },
-  {
-    _id: '2',
-    titulo: 'Feira de Ciências 2026',
-    conteudo: 'A feira acontece no dia 20, no ginásio, a partir das 9h.',
-    tipo: 'evento',
-    tags: ['feira', 'ciencias', 'estagio'],
-    autor: { nome: 'Prof. Carlos ✔', papel: 'servidor' },
-    criadoEm: '2026-11-12T09:30:00.000Z',
-  },
-  {
-    _id: '3',
-    titulo: 'Reunião de pais na sexta',
-    conteudo: 'Reunião geral na sexta-feira, às 19h, no auditório.',
-    tipo: 'anuncio',
-    tags: ['reuniao'],
-    autor: { nome: 'Prof. Carlos ✔', papel: 'servidor' },
-    criadoEm: '2026-11-13T18:00:00.000Z',
-  },
-];
-
 function App() {
+  const [posts, setPosts] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function carregarPosts() {
+      try {
+        setErro('');
+        const resposta = await apiGet('/posts', { signal: controller.signal });
+        // nossa API devolve o array direto; se vier { data, meta }, usa data
+        setPosts(Array.isArray(resposta) ? resposta : (resposta.data ?? []));
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+        setErro(e.message);
+      } finally {
+        if (!controller.signal.aborted) setCarregando(false);
+      }
+    }
+
+    carregarPosts();
+
+    return () => controller.abort();
+  }, []);
+
   return (
     <>
       <Header />
@@ -47,11 +45,28 @@ function App() {
           <section className="publicacoes" id="publicacoes">
             <h2 className="secao__titulo">Publicações</h2>
             <Filtros />
-            <div className="grade">
-              {POSTS_EXEMPLO.map((post) => (
-                <PostCard key={post._id} post={post} />
-              ))}
-            </div>
+
+            {carregando && <p className="estado">Carregando publicações...</p>}
+
+            {!carregando && erro && (
+              <p className="estado estado--erro" role="alert">
+                {erro}
+              </p>
+            )}
+
+            {!carregando && !erro && posts.length === 0 && (
+              <p className="estado">
+                Nenhuma publicação ainda. Seja o primeiro a publicar!
+              </p>
+            )}
+
+            {!carregando && !erro && posts.length > 0 && (
+              <div className="grade">
+                {posts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
+            )}
           </section>
         </div>
       </main>

@@ -72,7 +72,7 @@ export const PostService = {
     if (tag) filtro.tags = String(tag).trim().toLowerCase();
     if (tipo) filtro.tipo = tipo;
 
-    const posts = await PostModel.listar(filtro);
+    const posts = await PostModel.buscarTodas(filtro);
     return Promise.all(posts.map(comAutor));
   },
 
