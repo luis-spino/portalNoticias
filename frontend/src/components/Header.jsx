@@ -1,10 +1,17 @@
 function Header() {
   return (
     <header className="cabecalho">
-      <h1 className="cabecalho__titulo">Portal de Notícias</h1>
-      <p className="cabecalho__subtitulo">
-        Projetos, eventos e avisos da nossa instituição
-      </p>
+      <div className="cabecalho__conteudo">
+        <a href="#inicio" className="logo">
+          <span className="logo__marca">PN</span>
+          <span className="logo__texto">Portal de Notícias</span>
+        </a>
+        <nav className="menu" aria-label="Principal">
+          <a href="#inicio">Início</a>
+          <a href="#publicacoes">Publicações</a>
+          <a href="#publicar">Publicar</a>
+        </nav>
+      </div>
     </header>
   );
 }
