@@ -9,7 +9,7 @@ export const AutorModel = {
     return { _id: resultado.insertedId, ...autor };
   },
 
-  listar() {
+  buscarTodas() {
     return colecao().find().toArray();
   },
 

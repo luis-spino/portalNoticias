@@ -10,7 +10,7 @@ export const PostModel = {
     return { _id: resultado.insertedId, ...doc };
   },
   
-  listar(filtro = {}) {
+  buscarTodas(filtro = {}) {
     return colecao().find(filtro).sort({ criadoEm: -1 }).toArray();
   },
 
