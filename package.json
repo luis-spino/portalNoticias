@@ -6,9 +6,16 @@
   
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
-  },
+  "predev": "docker compose up -d",
+  "prestart": "docker compose up -d",
+  "start": "node server.js",
+  "dev": "node --watch server.js",
+  "db:up": "docker compose up -d",
+  "db:down": "docker compose down",
+  "db:logs": "docker compose logs -f mongo",
+  "db:shell": "docker compose exec mongo sh -c 'mongosh -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin portal_noticias'",
+  "db:limpar": "docker compose exec mongo sh -c 'mongosh -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin portal_noticias --eval \"db.autores.deleteMany({}); db.leitores.deleteMany({}); db.posts.deleteMany({}); db.comentarios.deleteMany({})\"'"
+},
   "keywords": [],
   "author": "Larissa Prado e Luis Gustavo",
   "license": "ISC",
