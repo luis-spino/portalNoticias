@@ -22,7 +22,13 @@ Projeto da disciplina **Aplicações e Tecnologia para Aplicação Servidor**.
 12. [Formato das respostas e códigos de status](#12-formato-das-respostas-e-códigos-de-status)
 13. [Como testar no Postman](#13-como-testar-no-postman)
 14. [Limitações conhecidas](#14-limitações-conhecidas)
-
+15. funções extras: 
+buscarPorEmail - Para que serve: Dar o erro 409 “e-mail já cadastrado” antes de gravar - Model: autor e leitor
+buscarRepresentanteDaSala - Para que serve: Regra - só um representante por sala - Model: autor
+contarDesde - Para que serve: Regra - representante publica até 2 posts por semana - Model: post
+removerPorAutor - Para que serve: Apagar os posts quando o autor é excluído - Model: post
+listarPorPost - Para que serve: Listar os comentários de um post (visíveis ou todos) - Model: comentário	
+atualizarStatus - Para que serve: Ocultar e reexibir comentário (moderação) - Model: comentário	
 ---
 
 ## 1. Sobre o projeto
@@ -102,6 +108,7 @@ portalNoticias/
 ├── .env                           Variáveis de ambiente (não versionado)
 ├── .env.example                   Modelo do .env
 ├── .gitignore
+├── .docker-compose.yml
 ├── README.md
 └── src/
     ├── app.js                     Configura o Express, middlewares globais e rotas
@@ -337,17 +344,6 @@ cd portalNoticias
 **2. Subir o MongoDB com Docker**
 
 ```bash
-docker run -d --name mongo-portal -p 27017:27017 \
-  -e MONGO_INITDB_ROOT_USERNAME=admin \
-  -e MONGO_INITDB_ROOT_PASSWORD=senha_dev_123 \
-  mongo:7
-```
-
-Confira com `docker ps`. Se o container já existir e estiver parado: `docker start mongo-portal`.
-
-**3. Criar o arquivo `.env` na raiz** (copie do `.env.example`)
-
-```bash
 cp .env.example .env
 ```
 
@@ -360,6 +356,31 @@ cp .env.example .env
 | `MONGODB_URI` | String de conexão (`authSource=admin` é necessário) |
 
 O `.env` não é versionado (está no `.gitignore`).
+
+**3. Criar o arquivo `.env` na raiz** (copie do `.env.example`)
+
+O projeto traz um `docker-compose.yml` que usa as credenciais do `.env`:
+
+```bash
+npm run db:up
+```
+
+Confira com `docker ps` (deve aparecer o container `mongo-portal`).
+
+Scripts úteis do banco:
+
+| Comando | O que faz |
+|---|---|
+| `npm run db:up` | Sobe o MongoDB em segundo plano |
+| `npm run db:down` | Para e remove o container (os dados permanecem no volume) |
+| `npm run db:logs` | Mostra os logs do MongoDB |
+| `npm run db:shell` | Abre o shell do MongoDB no banco `portal_noticias` |
+| `npm run db:limpar` | Apaga os dados das coleções (mantém os índices) |
+
+Por que o `.env` vem antes: o `docker-compose.yml` lê `MONGO_USER` e `MONGO_PASSWORD` dele, então crie o `.env` (passo 3) antes de subir o banco.
+
+Confira com `docker ps`. Se o container já existir e estiver parado: `docker start mongo-portal`.
+
 
 **4. Instalar as dependências**
 
@@ -603,14 +624,11 @@ Valores aceitos: `visivel` ou `oculto`. Erros: `400` (status inválido), `403` (
 
 ### Para repetir os testes do zero
 
-Os e-mails são únicos, então limpe as coleções antes de repetir (isso mantém os índices):
+Os e-mails são únicos, então limpe as coleções antes de repetir os testes (isso mantém os índices):
 
 ```bash
-docker exec mongo-portal mongosh -u admin -p senha_dev_123 --authenticationDatabase admin portal_noticias \
-  --eval "db.autores.deleteMany({}); db.leitores.deleteMany({}); db.posts.deleteMany({}); db.comentarios.deleteMany({})"
+npm run db:limpar
 ```
-
----
 
 ## 14. Limitações conhecidas
 
