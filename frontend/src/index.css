@@ -767,6 +767,44 @@ a {
   text-align: right;
 }
 
+/* ---------- Moderação de comentários ---------- */
+.comentario--oculto {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.selo-oculto {
+  padding: 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--branco);
+  background: var(--marinho);
+  border-radius: 999px;
+}
+
+.comentario__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.comentarios__ocultos {
+  font-family: var(--fonte-texto);
+  font-size: 0.9rem;
+  color: var(--cinza);
+}
+
+.comentarios__moderacao {
+  margin: 0 0 12px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: var(--amarelo);
+  border: 2px solid var(--marinho);
+  border-radius: 10px;
+}
 
 /* ---------- Responsivo ---------- */
 @media (max-width: 860px) {

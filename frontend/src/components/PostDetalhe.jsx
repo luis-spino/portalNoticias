@@ -37,7 +37,7 @@ function PostDetalhe({ post, usuario = null, onVoltar = () => {} }) {
         ))}
       </ul>
 
-      <Comentarios postId={post._id} usuario={usuario} />
+    <Comentarios post={post} usuario={usuario} />
     </article>
   );
 }
