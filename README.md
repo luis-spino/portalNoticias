@@ -638,3 +638,24 @@ npm run db:limpar
 - **Fuso horário:** o início da semana (segunda 00:00) usa o horário do servidor.
 - **Sem paginação:** as listagens retornam todos os registros.
 - **Somente backend:** o frontend será feito em uma etapa futura.
+
+---
+
+## 15. Frontend
+
+O frontend (React + Vite) está na pasta [`frontend/`](frontend/) e tem README próprio, com a descrição, a tabela de campos e rotas, os testes e a explicação de NoSQL vs SQL.
+
+Para rodar tudo:
+
+```bash
+# terminal 1 (raiz)
+npm run db:up ou docker start mongo-portal
+npm run dev
+
+# terminal 2
+cd frontend
+npm install
+npm run dev
+```
+
+A interface abre em `http://localhost:5173` e consome esta API pelo proxy do Vite.
