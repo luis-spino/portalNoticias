@@ -11,6 +11,7 @@ const ROTULOS = {
 function PostCard({
   post,
   usuario = null,
+  onAbrir = () => {},
   onEditar = () => {},
   onExcluir = () => {},
 }) {
@@ -34,6 +35,14 @@ function PostCard({
           </li>
         ))}
       </ul>
+
+      <button
+        type="button"
+        className="botao botao--pequeno card__abrir"
+        onClick={() => onAbrir(post)}
+      >
+        Ler e comentar →
+      </button>
 
       <footer className="card__rodape">
         <div className="card__autor">

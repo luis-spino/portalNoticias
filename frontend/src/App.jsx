@@ -9,6 +9,7 @@ import Hero from './components/Hero.jsx';
 import Identificacao from './components/Identificacao.jsx';
 import Filtros from './components/Filtros.jsx';
 import PostCard from './components/PostCard.jsx';
+import PostDetalhe from './components/PostDetalhe.jsx';
 import PostForm from './components/PostForm.jsx';
 
 function App() {
@@ -17,13 +18,14 @@ function App() {
   const [erro, setErro] = useState('');
   const [erroAcao, setErroAcao] = useState('');
   const [postEmEdicao, setPostEmEdicao] = useState(null);
+  const [postAbertoId, setPostAbertoId] = useState(null);
   const [usuario, setUsuario] = useState(lerUsuarioSalvo);
 
   const [busca, setBusca] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState('todos');
   const [tagFiltro, setTagFiltro] = useState('');
 
-  //carrega a lista uma vez, no primeiro render
+  // RF01: carrega a lista uma vez, no primeiro render
   useEffect(() => {
     const controller = new AbortController();
 
@@ -45,7 +47,7 @@ function App() {
     return () => controller.abort();
   }, []);
 
-  //filtros calculados a partir do estado, sem nova requisição
+  // RF05: filtros calculados a partir do estado, sem nova requisição
   const tagsDisponiveis = listarTags(posts);
   const tagAtiva = tagsDisponiveis.includes(tagFiltro) ? tagFiltro : '';
   const postsFiltrados = filtrarPosts(posts, {
@@ -54,10 +56,19 @@ function App() {
     tag: tagAtiva,
   });
 
+  // Post aberto na visualização individual (se foi excluído, volta para a lista)
+  const postDetalhe = posts.find((p) => p._id === postAbertoId);
+
   function limparFiltros() {
     setBusca('');
     setTipoFiltro('todos');
     setTagFiltro('');
+  }
+
+  function abrirPost(post) {
+    setErroAcao('');
+    setPostAbertoId(post._id);
+    document.getElementById('publicacoes')?.scrollIntoView({ behavior: 'smooth' });
   }
 
   //identificação
@@ -157,62 +168,76 @@ function App() {
           </aside>
 
           <section className="publicacoes" id="publicacoes">
-            <h2 className="secao__titulo">Publicações</h2>
-
-            <Filtros
-              busca={busca}
-              onBuscaChange={setBusca}
-              tipo={tipoFiltro}
-              onTipoChange={setTipoFiltro}
-              tags={tagsDisponiveis}
-              tagAtiva={tagAtiva}
-              onTagChange={setTagFiltro}
-              onLimpar={limparFiltros}
-            />
-
-            {erroAcao && (
-              <p className="estado estado--erro" role="alert">
-                {erroAcao}
-              </p>
-            )}
-
-            {carregando && <p className="estado">Carregando publicações...</p>}
-
-            {!carregando && erro && (
-              <p className="estado estado--erro" role="alert">
-                {erro}
-              </p>
-            )}
-
-            {!carregando && !erro && posts.length === 0 && (
-              <p className="estado">
-                Nenhuma publicação ainda. Seja o primeiro a publicar!
-              </p>
-            )}
-
-            {!carregando && !erro && posts.length > 0 && postsFiltrados.length === 0 && (
-              <p className="estado">
-                Nenhuma publicação encontrada com esses filtros.
-              </p>
-            )}
-
-            {!carregando && !erro && postsFiltrados.length > 0 && (
+            {postDetalhe ? (
+              <PostDetalhe
+                post={postDetalhe}
+                usuario={usuario}
+                onVoltar={() => setPostAbertoId(null)}
+              />
+            ) : (
               <>
-                <p className="contagem">
-                  {postsFiltrados.length}{' '}
-                  {postsFiltrados.length === 1 ? 'publicação' : 'publicações'}
-                </p>
-                <div className="grade">
-                  {postsFiltrados.map((post) => (
-                    <PostCard
-                      key={post._id}
-                      post={post}
-                      usuario={usuario}
-                      onEditar={iniciarEdicao}
-                      onExcluir={excluirPost}
-                    />
-                  ))}
-                </div>
+                <h2 className="secao__titulo">Publicações</h2>
+
+                <Filtros
+                  busca={busca}
+                  onBuscaChange={setBusca}
+                  tipo={tipoFiltro}
+                  onTipoChange={setTipoFiltro}
+                  tags={tagsDisponiveis}
+                  tagAtiva={tagAtiva}
+                  onTagChange={setTagFiltro}
+                  onLimpar={limparFiltros}
+                />
+
+                {erroAcao && (
+                  <p className="estado estado--erro" role="alert">
+                    {erroAcao}
+                  </p>
+                )}
+
+                {carregando && <p className="estado">Carregando publicações...</p>}
+
+                {!carregando && erro && (
+                  <p className="estado estado--erro" role="alert">
+                    {erro}
+                  </p>
+                )}
+
+                {!carregando && !erro && posts.length === 0 && (
+                  <p className="estado">
+                    Nenhuma publicação ainda. Seja o primeiro a publicar!
+                  </p>
+                )}
+
+                {!carregando &&
+                  !erro &&
+                  posts.length > 0 &&
+                  postsFiltrados.length === 0 && (
+                    <p className="estado">
+                      Nenhuma publicação encontrada com esses filtros.
+                    </p>
+                  )}
+
+                {!carregando && !erro && postsFiltrados.length > 0 && (
+                  <>
+                    <p className="contagem">
+                      {postsFiltrados.length}{' '}
+                      {postsFiltrados.length === 1 ? 'publicação' : 'publicações'}
+                    </p>
+                    <div className="grade">
+                      {postsFiltrados.map((post) => (
+                        <PostCard
+                          key={post._id}
+                          post={post}
+                          usuario={usuario}
+                          onAbrir={abrirPost}
+                          onEditar={iniciarEdicao}
+                          onExcluir={excluirPost}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </>
             )}
           </section>

@@ -643,6 +643,130 @@ a {
   font-weight: 700;
 }
 
+/* ---------- Card: resumo e botão de abrir ---------- */
+.card__texto {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card__abrir {
+  align-self: flex-start;
+}
+
+/* ---------- Post individual ---------- */
+.detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 24px;
+  background: var(--branco);
+  border: 2px solid var(--marinho);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+.detalhe > .botao {
+  align-self: flex-start;
+}
+
+.detalhe--projeto {
+  background: var(--lilas);
+}
+
+.detalhe--evento {
+  background: var(--menta);
+}
+
+.detalhe--anuncio {
+  background: var(--pessego);
+}
+
+.detalhe__titulo {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.detalhe__meta {
+  margin: 0;
+  color: var(--cinza);
+}
+
+.detalhe__texto {
+  margin: 0;
+  font-size: 1.05rem;
+  white-space: pre-wrap;
+}
+
+/* ---------- Comentários ---------- */
+.comentarios {
+  margin-top: 12px;
+  padding: 20px;
+  background: var(--branco);
+  border: 2px solid var(--marinho);
+  border-radius: var(--raio);
+}
+
+.comentarios__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-family: var(--fonte-titulo);
+  font-size: 1.2rem;
+}
+
+.comentarios__lista {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.comentario {
+  padding: 12px 14px;
+  background: var(--papel);
+  border: 2px solid var(--marinho);
+  border-radius: 12px;
+}
+
+.comentario__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.comentario__cabecalho span {
+  color: var(--cinza);
+}
+
+.comentario__texto {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comentarios__form {
+  margin-top: 16px;
+}
+
+.comentarios__aviso {
+  margin: 16px 0 0;
+  font-weight: 700;
+}
+
+.contador {
+  color: var(--cinza);
+  text-align: right;
+}
+
 
 /* ---------- Responsivo ---------- */
 @media (max-width: 860px) {
