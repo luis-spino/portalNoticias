@@ -5,9 +5,11 @@ import leitorRoutes from './routes/leitorRoutes.js';
 import comentarioRoutes from './routes/comentarioRoutes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { logger } from './middlewares/logger.js';
+import { cors } from './middlewares/cors.js';
 
 const app = express();
 
+app.use(cors);
 app.use(express.json());
 app.use(logger);
 
