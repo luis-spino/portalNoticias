@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react';
-import { apiGet, apiPost } from '../api.js';
+import { apiGet, apiPost, apiPatch, apiDelete } from '../api.js';
 import {
   validarComentario,
   LIMITE_COMENTARIO,
 } from '../utils/validarComentario.js';
+import {
+  podeModerarComentarios,
+  podeExcluirComentario,
+} from '../utils/permissoes.js';
 import { formatarData } from '../utils/formatar.js';
 import Sticker from './Sticker.jsx';
 
-function Comentarios({ postId, usuario = null }) {
+function Comentarios({ post, usuario = null }) {
+  const postId = post._id;
+  const usuarioId = usuario?._id;
+  const moderador = podeModerarComentarios(usuario, post);
+
   const [comentarios, setComentarios] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [erroAcao, setErroAcao] = useState('');
   const [texto, setTexto] = useState('');
   const [erroTexto, setErroTexto] = useState('');
   const [erroApi, setErroApi] = useState('');
   const [enviando, setEnviando] = useState(false);
 
-  //carrega os comentários visíveis do post
+  //moderador carrega todos (inclusive ocultos); os demais, só os visíveis
   useEffect(() => {
     const controller = new AbortController();
 
@@ -24,8 +33,12 @@ function Comentarios({ postId, usuario = null }) {
       try {
         setCarregando(true);
         setErro('');
-        const resposta = await apiGet(`/posts/${postId}/comentarios`, {
+        const caminho = moderador
+          ? `/posts/${postId}/comentarios/todos`
+          : `/posts/${postId}/comentarios`;
+        const resposta = await apiGet(caminho, {
           signal: controller.signal,
+          usuarioId: moderador ? usuarioId : undefined,
         });
         setComentarios(Array.isArray(resposta) ? resposta : (resposta.data ?? []));
       } catch (e) {
@@ -39,7 +52,7 @@ function Comentarios({ postId, usuario = null }) {
     carregar();
 
     return () => controller.abort();
-  }, [postId]);
+  }, [postId, moderador, usuarioId]);
 
   async function enviar(evento) {
     evento.preventDefault();
@@ -48,7 +61,7 @@ function Comentarios({ postId, usuario = null }) {
     setErroTexto(mensagem);
     setErroApi('');
 
-    // validação falhou, não chama a API
+    //validação falhou, não chama a API
     if (mensagem) return;
 
     try {
@@ -56,9 +69,8 @@ function Comentarios({ postId, usuario = null }) {
       const novo = await apiPost(
         `/posts/${postId}/comentarios`,
         { texto: texto.trim() },
-        { usuarioId: usuario._id },
+        { usuarioId },
       );
-      // a API lista do mais antigo para o mais novo
       setComentarios((atuais) => [...atuais, novo]);
       setTexto('');
     } catch (e) {
@@ -68,12 +80,64 @@ function Comentarios({ postId, usuario = null }) {
     }
   }
 
+  //alterna entre visível e oculto e troca o item com map
+  async function alternarStatus(comentario) {
+    const novoStatus = comentario.status === 'oculto' ? 'visivel' : 'oculto';
+
+    try {
+      setErroAcao('');
+      const atualizado = await apiPatch(
+        `/comentarios/${comentario._id}/moderar`,
+        { status: novoStatus },
+        { usuarioId },
+      );
+      setComentarios((atuais) =>
+        atuais.map((c) => (c._id === atualizado._id ? atualizado : c)),
+      );
+    } catch (e) {
+      setErroAcao(e.message);
+    }
+  }
+
+  //DELETE e tira o item com filter
+  async function excluir(comentario) {
+    if (!window.confirm('Excluir este comentário?')) return;
+
+    try {
+      setErroAcao('');
+      await apiDelete(`/comentarios/${comentario._id}`, { usuarioId });
+      setComentarios((atuais) => atuais.filter((c) => c._id !== comentario._id));
+    } catch (e) {
+      setErroAcao(e.message);
+    }
+  }
+
+  const ocultos = comentarios.filter((c) => c.status === 'oculto').length;
+  const visiveis = comentarios.length - ocultos;
+
   return (
     <section className="comentarios" aria-label="Comentários">
       <h3 className="comentarios__titulo">
         <Sticker nome="comentario" tamanho={36} />
-        Comentários ({comentarios.length})
+        Comentários ({visiveis})
+        {moderador && ocultos > 0 && (
+          <span className="comentarios__ocultos">
+            · {ocultos} {ocultos === 1 ? 'oculto' : 'ocultos'}
+          </span>
+        )}
       </h3>
+
+      {moderador && (
+        <p className="comentarios__moderacao">
+          Moderação: você também vê os comentários ocultos.
+        </p>
+      )}
+
+      {erroAcao && (
+        <p className="aviso-erro" role="alert">
+          {erroAcao}
+        </p>
+      )}
 
       {carregando && <p className="estado">Carregando comentários...</p>}
 
@@ -89,15 +153,48 @@ function Comentarios({ postId, usuario = null }) {
 
       {!carregando && !erro && comentarios.length > 0 && (
         <ul className="comentarios__lista">
-          {comentarios.map((comentario) => (
-            <li key={comentario._id} className="comentario">
-              <div className="comentario__cabecalho">
-                <strong>{comentario.usuarioNome}</strong>
-                <span>{formatarData(comentario.criadoEm)}</span>
-              </div>
-              <p className="comentario__texto">{comentario.texto}</p>
-            </li>
-          ))}
+          {comentarios.map((comentario) => {
+            const oculto = comentario.status === 'oculto';
+            const podeExcluir = podeExcluirComentario(usuario, comentario, post);
+
+            return (
+              <li
+                key={comentario._id}
+                className={oculto ? 'comentario comentario--oculto' : 'comentario'}
+              >
+                <div className="comentario__cabecalho">
+                  <strong>{comentario.usuarioNome}</strong>
+                  {oculto && <span className="selo-oculto">Oculto</span>}
+                  <span>{formatarData(comentario.criadoEm)}</span>
+                </div>
+
+                <p className="comentario__texto">{comentario.texto}</p>
+
+                {(moderador || podeExcluir) && (
+                  <div className="comentario__acoes">
+                    {moderador && (
+                      <button
+                        type="button"
+                        className="botao botao--pequeno"
+                        onClick={() => alternarStatus(comentario)}
+                      >
+                        {oculto ? 'Reexibir' : 'Ocultar'}
+                      </button>
+                    )}
+                    {podeExcluir && (
+                      <button
+                        type="button"
+                        className="botao botao--pequeno botao--perigo"
+                        onClick={() => excluir(comentario)}
+                      >
+                        Excluir
+                      </button>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
 
