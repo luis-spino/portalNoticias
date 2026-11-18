@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
 import { filtrarPosts, listarTags } from './utils/filtrarPosts.js';
+import { podePublicar, podeExcluirPost } from './utils/permissoes.js';
+import { lerUsuarioSalvo, salvarUsuario, limparUsuario } from './utils/sessao.js';
+import { cadastrarUsuario, entrarComId } from './servicos/usuarios.js';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
+import Identificacao from './components/Identificacao.jsx';
 import Filtros from './components/Filtros.jsx';
 import PostCard from './components/PostCard.jsx';
 import PostForm from './components/PostForm.jsx';
@@ -13,7 +17,7 @@ function App() {
   const [erro, setErro] = useState('');
   const [erroAcao, setErroAcao] = useState('');
   const [postEmEdicao, setPostEmEdicao] = useState(null);
-  const [usuarioId, setUsuarioId] = useState('');
+  const [usuario, setUsuario] = useState(lerUsuarioSalvo);
 
   const [busca, setBusca] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState('todos');
@@ -56,10 +60,32 @@ function App() {
     setTagFiltro('');
   }
 
+  //identificação
+  function definirUsuario(novo) {
+    setUsuario(novo);
+    salvarUsuario(novo);
+    setErroAcao('');
+  }
+
+  async function cadastrar(dados) {
+    definirUsuario(await cadastrarUsuario(dados));
+  }
+
+  async function entrar(id, tipo) {
+    definirUsuario(await entrarComId(id, tipo));
+  }
+
+  function sair() {
+    setUsuario(null);
+    limparUsuario();
+    setPostEmEdicao(null);
+    setErroAcao('');
+  }
+
   //cria ou edita, atualizando o estado sem novo GET
   async function salvarPost(dados) {
     setErroAcao('');
-    const opcoes = { usuarioId: usuarioId.trim() };
+    const opcoes = { usuarioId: usuario._id };
 
     if (postEmEdicao) {
       const atualizado = await apiPut(`/posts/${postEmEdicao._id}`, dados, opcoes);
@@ -79,17 +105,17 @@ function App() {
     document.getElementById('publicar')?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  //exclui e tira o post do estado com filter
+  //exclui (DELETE) e tira o post do estado com filter
   async function excluirPost(post) {
-    if (!usuarioId.trim()) {
-      setErroAcao('Informe o seu ID de autor no formulário para excluir.');
+    if (!podeExcluirPost(usuario, post)) {
+      setErroAcao('Você não tem permissão para excluir esta publicação.');
       return;
     }
     if (!window.confirm(`Excluir "${post.titulo}"?`)) return;
 
     try {
       setErroAcao('');
-      await apiDelete(`/posts/${post._id}`, { usuarioId: usuarioId.trim() });
+      await apiDelete(`/posts/${post._id}`, { usuarioId: usuario._id });
       setPosts((atuais) => atuais.filter((p) => p._id !== post._id));
       if (postEmEdicao?._id === post._id) setPostEmEdicao(null);
     } catch (e) {
@@ -104,13 +130,31 @@ function App() {
         <Hero />
 
         <div className="layout">
-          <PostForm
-            postEmEdicao={postEmEdicao}
-            usuarioId={usuarioId}
-            onUsuarioIdChange={setUsuarioId}
-            onSalvar={salvarPost}
-            onCancelar={() => setPostEmEdicao(null)}
-          />
+          <aside className="lateral">
+            <Identificacao
+              usuario={usuario}
+              onCadastrar={cadastrar}
+              onEntrar={entrar}
+              onSair={sair}
+            />
+
+            {podePublicar(usuario) ? (
+              <PostForm
+                postEmEdicao={postEmEdicao}
+                onSalvar={salvarPost}
+                onCancelar={() => setPostEmEdicao(null)}
+              />
+            ) : (
+              <section className="formulario" id="publicar">
+                <h2 className="secao__titulo">Publicar</h2>
+                <p>
+                  {usuario
+                    ? 'Leitores podem comentar, mas só autores publicam.'
+                    : 'Entre como autor para publicar.'}
+                </p>
+              </section>
+            )}
+          </aside>
 
           <section className="publicacoes" id="publicacoes">
             <h2 className="secao__titulo">Publicações</h2>
@@ -163,6 +207,7 @@ function App() {
                     <PostCard
                       key={post._id}
                       post={post}
+                      usuario={usuario}
                       onEditar={iniciarEdicao}
                       onExcluir={excluirPost}
                     />

@@ -605,6 +605,45 @@ a {
   color: var(--cinza);
 }
 
+
+/* ---------- Coluna lateral: identificação + formulário ---------- */
+.lateral {
+  display: grid;
+  gap: 24px;
+}
+
+.formulario {
+  position: static;
+}
+
+.identificacao {
+  padding: 24px;
+  background: var(--amarelo);
+  border: 2px solid var(--marinho);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+.identificacao .secao__titulo {
+  font-size: 1.3rem;
+}
+
+.identificacao .filtros {
+  margin-bottom: 16px;
+}
+
+.identificacao__nome {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 1.2rem;
+}
+
+.identificacao__papel {
+  margin: 4px 0 12px;
+  font-weight: 700;
+}
+
+
 /* ---------- Responsivo ---------- */
 @media (max-width: 860px) {
   .layout {
@@ -614,6 +653,10 @@ a {
   .formulario {
     position: static;
     order: 2; /* no celular, a lista vem antes do formulário */
+  }
+
+  .lateral {
+    order: 2;
   }
 
   .hero__adesivos,

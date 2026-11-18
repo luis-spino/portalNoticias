@@ -4,13 +4,7 @@ import { converterTags, tagsParaTexto } from '../utils/tags.js';
 
 const CAMPOS_VAZIOS = { titulo: '', tipo: 'projeto', conteudo: '', tags: '' };
 
-function PostForm({
-  postEmEdicao = null,
-  usuarioId = '',
-  onUsuarioIdChange = () => {},
-  onSalvar,
-  onCancelar = () => {},
-}) {
+function PostForm({ postEmEdicao = null, onSalvar, onCancelar = () => {} }) {
   const [campos, setCampos] = useState(CAMPOS_VAZIOS);
   const [erros, setErros] = useState({});
   const [erroApi, setErroApi] = useState('');
@@ -18,7 +12,7 @@ function PostForm({
 
   const editando = Boolean(postEmEdicao);
 
-  // Quando clica em "Editar" (ou cancela), o formulário é preenchido ou limpo
+  //quando clica em "editar" (ou cancela), o formulário é preenchido ou limpo
   useEffect(() => {
     if (postEmEdicao) {
       setCampos({
@@ -43,11 +37,10 @@ function PostForm({
     evento.preventDefault();
 
     const novosErros = validarPost(campos);
-    if (!usuarioId.trim()) novosErros.usuarioId = 'Informe o seu ID de autor.';
     setErros(novosErros);
     setErroApi('');
 
-    // Validação falhou, ele não chama a API
+    // validação falhou, não chama a API
     if (Object.keys(novosErros).length > 0) return;
 
     const dados = {
@@ -75,19 +68,6 @@ function PostForm({
       </h2>
 
       <form onSubmit={aoEnviar} noValidate>
-        <div className="campo">
-          <label htmlFor="usuarioId">Seu ID de autor</label>
-          <input
-            id="usuarioId"
-            type="text"
-            value={usuarioId}
-            onChange={(e) => onUsuarioIdChange(e.target.value)}
-            placeholder="Cole aqui o _id do autor"
-          />
-          <small>Provisório: na Etapa 6 isso vira identificação de verdade.</small>
-          {erros.usuarioId && <small className="erro-campo">{erros.usuarioId}</small>}
-        </div>
-
         <div className="campo">
           <label htmlFor="titulo">Título</label>
           <input

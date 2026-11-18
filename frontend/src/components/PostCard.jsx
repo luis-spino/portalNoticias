@@ -1,5 +1,6 @@
 import Sticker from './Sticker.jsx';
 import { formatarData } from '../utils/formatar.js';
+import { podeEditarPost, podeExcluirPost } from '../utils/permissoes.js';
 
 const ROTULOS = {
   projeto: 'Projeto',
@@ -7,7 +8,15 @@ const ROTULOS = {
   anuncio: 'Anúncio',
 };
 
-function PostCard({ post, onEditar = () => {}, onExcluir = () => {} }) {
+function PostCard({
+  post,
+  usuario = null,
+  onEditar = () => {},
+  onExcluir = () => {},
+}) {
+  const podeEditar = podeEditarPost(usuario, post);
+  const podeExcluir = podeExcluirPost(usuario, post);
+
   return (
     <article className={`card card--${post.tipo}`}>
       <div className="card__topo">
@@ -31,22 +40,29 @@ function PostCard({ post, onEditar = () => {}, onExcluir = () => {} }) {
           <strong>{post.autor?.nome ?? 'Autor removido'}</strong>
           <span>{formatarData(post.criadoEm)}</span>
         </div>
-        <div className="card__acoes">
-          <button
-            type="button"
-            className="botao botao--pequeno"
-            onClick={() => onEditar(post)}
-          >
-            Editar
-          </button>
-          <button
-            type="button"
-            className="botao botao--pequeno botao--perigo"
-            onClick={() => onExcluir(post)}
-          >
-            Excluir
-          </button>
-        </div>
+
+        {(podeEditar || podeExcluir) && (
+          <div className="card__acoes">
+            {podeEditar && (
+              <button
+                type="button"
+                className="botao botao--pequeno"
+                onClick={() => onEditar(post)}
+              >
+                Editar
+              </button>
+            )}
+            {podeExcluir && (
+              <button
+                type="button"
+                className="botao botao--pequeno botao--perigo"
+                onClick={() => onExcluir(post)}
+              >
+                Excluir
+              </button>
+            )}
+          </div>
+        )}
       </footer>
     </article>
   );
