@@ -46,7 +46,7 @@ export const AutorService = {
   },
 
   async listar() {
-    const autores = await AutorModel.listar();
+    const autores = await AutorModel.buscarTodas();
     return autores.map(formatar);
   },
 
