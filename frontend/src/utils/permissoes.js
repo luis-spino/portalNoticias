@@ -37,3 +37,9 @@ export function rotuloPapel(usuario) {
   if (usuario.papel === 'servidor') return 'Servidor';
   return usuario.sala ? `Representante da sala ${usuario.sala}` : 'Representante';
 }
+
+export function podeExcluirComentario(usuario, comentario, post) {
+  const ehAutorDoComentario =
+    Boolean(usuario) && String(comentario?.usuarioId) === String(usuario._id);
+  return ehAutorDoComentario || podeModerarComentarios(usuario, post);
+}
