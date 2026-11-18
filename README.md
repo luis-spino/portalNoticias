@@ -659,3 +659,20 @@ npm run dev
 ```
 
 A interface abre em `http://localhost:5173` e consome esta API pelo proxy do Vite.
+
+---
+
+## 16. Requisitos do tema e limitações de escopo
+
+O tema do projeto prevê login de usuários com senha criptografada. Como autenticação com senha (criptografada) não foi conteúdo direto da disciplina (servidor HTTP, Express, middlewares, MVC e MongoDB), o projeto adota uma **identificação simplificada**:
+
+| Requisito do tema | Situação |
+|---|---|
+| Login de usuários | **Parcial:** o usuário se identifica informando o `_id` (header `x-usuario-id`). Não há senha |
+| Senhas criptografadas | **Não implementado** (não há senhas) |
+| Perfis aluno, representante e professor | **Atendido:** leitor (aluno), representante e servidor (professor) |
+| Só o perfil adequado publica ou edita | **Atendido nas regras, não na autenticação:** o backend valida o perfil, mas não comprova quem é o usuário. Quem conhecer um `_id` pode agir como aquela pessoa |
+| Representante publica | **Atendido** (limite de 2 por semana) |
+| Representante e professor editam notícias | **Parcial:** cada autor edita as próprias notícias; o professor também exclui qualquer uma |
+| Lista, leitura completa, data e autor | **Atendido** |
+| Responsivo, dados em banco, GitHub | **Atendido** |
