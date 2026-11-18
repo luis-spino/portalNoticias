@@ -7,7 +7,7 @@ const ROTULOS = {
   anuncio: 'Anúncio',
 };
 
-function PostCard({ post }) {
+function PostCard({ post, onEditar = () => {}, onExcluir = () => {} }) {
   return (
     <article className={`card card--${post.tipo}`}>
       <div className="card__topo">
@@ -32,10 +32,18 @@ function PostCard({ post }) {
           <span>{formatarData(post.criadoEm)}</span>
         </div>
         <div className="card__acoes">
-          <button type="button" className="botao botao--pequeno">
+          <button
+            type="button"
+            className="botao botao--pequeno"
+            onClick={() => onEditar(post)}
+          >
             Editar
           </button>
-          <button type="button" className="botao botao--pequeno botao--perigo">
+          <button
+            type="button"
+            className="botao botao--pequeno botao--perigo"
+            onClick={() => onExcluir(post)}
+          >
             Excluir
           </button>
         </div>

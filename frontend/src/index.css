@@ -528,6 +528,42 @@ a {
   border-style: solid;
 }
 
+/* ---------- Formulário: rótulos, erros e ações ---------- */
+.campo label {
+  font-weight: 700;
+}
+
+.campo--erro input,
+.campo--erro select,
+.campo--erro textarea {
+  border-color: #c0392b;
+}
+
+.erro-campo {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+.aviso-erro {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  font-weight: 700;
+  background: #ffd3d3;
+  border: 2px solid var(--marinho);
+  border-radius: 12px;
+}
+
+.formulario__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ---------- Responsivo ---------- */
 @media (max-width: 860px) {
   .layout {
