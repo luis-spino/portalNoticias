@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
+import { filtrarPosts, listarTags } from './utils/filtrarPosts.js';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
 import Filtros from './components/Filtros.jsx';
@@ -13,6 +14,10 @@ function App() {
   const [erroAcao, setErroAcao] = useState('');
   const [postEmEdicao, setPostEmEdicao] = useState(null);
   const [usuarioId, setUsuarioId] = useState('');
+
+  const [busca, setBusca] = useState('');
+  const [tipoFiltro, setTipoFiltro] = useState('todos');
+  const [tagFiltro, setTagFiltro] = useState('');
 
   //carrega a lista uma vez, no primeiro render
   useEffect(() => {
@@ -35,6 +40,21 @@ function App() {
 
     return () => controller.abort();
   }, []);
+
+  //filtros calculados a partir do estado, sem nova requisição
+  const tagsDisponiveis = listarTags(posts);
+  const tagAtiva = tagsDisponiveis.includes(tagFiltro) ? tagFiltro : '';
+  const postsFiltrados = filtrarPosts(posts, {
+    busca,
+    tipo: tipoFiltro,
+    tag: tagAtiva,
+  });
+
+  function limparFiltros() {
+    setBusca('');
+    setTipoFiltro('todos');
+    setTagFiltro('');
+  }
 
   //cria ou edita, atualizando o estado sem novo GET
   async function salvarPost(dados) {
@@ -59,7 +79,7 @@ function App() {
     document.getElementById('publicar')?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  // exclui e tira o post do estado com filter
+  //exclui e tira o post do estado com filter
   async function excluirPost(post) {
     if (!usuarioId.trim()) {
       setErroAcao('Informe o seu ID de autor no formulário para excluir.');
@@ -94,7 +114,17 @@ function App() {
 
           <section className="publicacoes" id="publicacoes">
             <h2 className="secao__titulo">Publicações</h2>
-            <Filtros />
+
+            <Filtros
+              busca={busca}
+              onBuscaChange={setBusca}
+              tipo={tipoFiltro}
+              onTipoChange={setTipoFiltro}
+              tags={tagsDisponiveis}
+              tagAtiva={tagAtiva}
+              onTagChange={setTagFiltro}
+              onLimpar={limparFiltros}
+            />
 
             {erroAcao && (
               <p className="estado estado--erro" role="alert">
@@ -116,17 +146,29 @@ function App() {
               </p>
             )}
 
-            {!carregando && !erro && posts.length > 0 && (
-              <div className="grade">
-                {posts.map((post) => (
-                  <PostCard
-                    key={post._id}
-                    post={post}
-                    onEditar={iniciarEdicao}
-                    onExcluir={excluirPost}
-                  />
-                ))}
-              </div>
+            {!carregando && !erro && posts.length > 0 && postsFiltrados.length === 0 && (
+              <p className="estado">
+                Nenhuma publicação encontrada com esses filtros.
+              </p>
+            )}
+
+            {!carregando && !erro && postsFiltrados.length > 0 && (
+              <>
+                <p className="contagem">
+                  {postsFiltrados.length}{' '}
+                  {postsFiltrados.length === 1 ? 'publicação' : 'publicações'}
+                </p>
+                <div className="grade">
+                  {postsFiltrados.map((post) => (
+                    <PostCard
+                      key={post._id}
+                      post={post}
+                      onEditar={iniciarEdicao}
+                      onExcluir={excluirPost}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </section>
         </div>

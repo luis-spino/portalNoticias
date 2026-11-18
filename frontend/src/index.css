@@ -564,6 +564,47 @@ a {
   cursor: not-allowed;
 }
 
+
+/* ---------- Filtro por tag e contagem ---------- */
+.tags-filtro {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tags-filtro > span {
+  font-weight: 700;
+}
+
+.tag-filtro {
+  padding: 2px 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--marinho);
+  background: var(--branco);
+  border: 2px solid var(--marinho);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tag-filtro:hover {
+  background: var(--amarelo);
+}
+
+.tag-filtro--ativa {
+  color: var(--branco);
+  background: var(--marinho);
+}
+
+.contagem {
+  margin: 0 0 16px;
+  font-weight: 700;
+  color: var(--cinza);
+}
+
 /* ---------- Responsivo ---------- */
 @media (max-width: 860px) {
   .layout {
