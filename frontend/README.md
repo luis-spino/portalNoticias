@@ -36,7 +36,7 @@ Este repositório contém o **frontend**. O backend (API REST em Express + Mongo
 
 - **Tema declarado:** Portal de notícias.
 - **O que o aplicativo gerencia:** o aplicativo gerencia **publicações (posts)** de projetos, eventos e anúncios da instituição, consumindo o recurso **`/api/posts`** da API do portal.
-- **Opção de API utilizada:** API própria da equipe (Express + MongoDB), desenvolvida na disciplina de Aplicações e Tecnologia para Aplicação Servidor. Não usa JSONPlaceholder.
+- **Opção de API utilizada:** API própria da equipe (Express + MongoDB), desenvolvida na disciplina de Aplicações e Tecnologia para Aplicação Servidor juntamente com os conhecimentos adquidos na disciplina PTAC. Não usa JSONPlaceholder.
 
 ---
 
@@ -140,7 +140,26 @@ Erros (formato `{ "erro": "..." }`): `400` dados inválidos, `401` não identifi
 Documento retornado por `GET /api/posts` (um item da lista):
 
 ```json
-SUBSTITUIR PELO JSON REAL DO PASSO 1
+{
+  "_id": "6afda114510e6a18207dc475",
+  "titulo": "Reunião de pais na sexta!!",
+  "conteudo": "fdhdfh",
+  "tipo": "anuncio",
+  "tags": [
+    "tecnologia",
+    "inovação",
+    "pesquisa",
+    "ifms"
+  ],
+  "autorId": "6afd97c5a5389134c2ad84ae",
+  "criadoEm": "2026-11-18T12:59:00.945Z",
+  "atualizadoEm": "2026-11-18T12:59:00.945Z",
+  "autor": {
+    "_id": "6afd97c5a5389134c2ad84ae",
+    "nome": "Luis Gustavo",
+    "papel": "representante"
+  }
+}
 ```
 
 ---
