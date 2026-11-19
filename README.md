@@ -337,7 +337,7 @@ Exemplo de linha de log:
 **1. Clonar o repositório e entrar na pasta**
 
 ```bash
-git clone <url-do-repositorio>
+git clone <https://github.com/luis-spino/portalNoticias.git>
 cd portalNoticias
 ```
 
